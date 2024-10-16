@@ -84,3 +84,37 @@ def test_add_or_update_normal_file_with_duplicates_concurrently():
 
     # Assert that the file path is added only once
     assert normalStore[file_hash].filepaths == [file_path]
+
+
+def test_add_single_file_metadata():
+    """
+    Test that a single new file's metadata is added correctly to normalStore.
+    """
+    file_path = "single_file_1.txt"
+    
+    # Call the function to add a new file's metadata
+    add_or_update_normal_file(file_path)
+    
+    # Assert that the store now contains the file's metadata
+    file_hash = mock_get_file_hash(file_path)
+    assert file_hash in normalStore
+    assert normalStore[file_hash].filepaths == [file_path]
+
+def test_update_existing_file_metadata_single_threaded():
+    """
+    Test that updating metadata works when a file with the same hash already exists
+    in a single-threaded context.
+    """
+    file_path_1 = "single_file_1.txt"
+    file_path_2 = "single_file_2.txt"
+    
+    # Add the first file's metadata
+    add_or_update_normal_file(file_path_1)
+    
+    # Add the second file (which has the same hash as the first one)
+    add_or_update_normal_file(file_path_2)
+    
+    # Assert that the metadata contains both file paths
+    file_hash = mock_get_file_hash(file_path_1)
+    assert file_hash in normalStore
+    assert normalStore[file_hash].filepaths == [file_path_1, file_path_2]
